@@ -5,6 +5,10 @@ import com.asutosh.expense_tracker.dto.ExpenseResponseDTO;
 import com.asutosh.expense_tracker.entity.Expense;
 import com.asutosh.expense_tracker.exception.ExpenseNotFoundException;
 import com.asutosh.expense_tracker.repository.ExpenseRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,8 +44,20 @@ public class ExpenseService {
         return response;
     }
 
-    public List<Expense> getAllExpenses() {
-        return expenseRepository.findAll();
+    public Page<Expense> getAllExpenses(
+            int page,
+            int size,
+            String sortBy
+    ) {
+
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size,
+                        Sort.by(sortBy)
+                );
+
+        return expenseRepository.findAll(pageable);
     }
 
     public Expense getExpenseById(Long id) {

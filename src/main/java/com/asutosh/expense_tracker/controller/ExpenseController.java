@@ -5,6 +5,7 @@ import com.asutosh.expense_tracker.dto.ExpenseResponseDTO;
 import com.asutosh.expense_tracker.entity.Expense;
 import com.asutosh.expense_tracker.service.ExpenseService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,8 +28,27 @@ public class ExpenseController {
     }
 
     @GetMapping
-    public List<Expense> getAllExpenses() {
-        return expenseService.getAllExpenses();
+    public Page<Expense> getAllExpenses(
+
+            @RequestParam(
+                    defaultValue = "0"
+            ) int page,
+
+            @RequestParam(
+                    defaultValue = "5"
+            ) int size,
+
+            @RequestParam(
+                    defaultValue = "amount"
+            ) String sortBy
+    ) {
+
+        return expenseService
+                .getAllExpenses(
+                        page,
+                        size,
+                        sortBy
+                );
     }
 
     @GetMapping("/{id}")

@@ -1,5 +1,7 @@
 package com.asutosh.expense_tracker.controller;
 
+import com.asutosh.expense_tracker.dto.ExpenseRequestDTO;
+import com.asutosh.expense_tracker.dto.ExpenseResponseDTO;
 import com.asutosh.expense_tracker.entity.Expense;
 import com.asutosh.expense_tracker.service.ExpenseService;
 import jakarta.validation.Valid;
@@ -18,9 +20,12 @@ public class ExpenseController {
     }
 
     @PostMapping
-    public Expense createExpense(@Valid @RequestBody Expense expense){
-        return expenseService.saveExpense(expense);
+    public ExpenseResponseDTO createExpense(
+            @Valid @RequestBody ExpenseRequestDTO request
+    ){
+        return expenseService.saveExpense(request);
     }
+
     @GetMapping
     public List<Expense> getAllExpenses() {
         return expenseService.getAllExpenses();
@@ -30,14 +35,15 @@ public class ExpenseController {
     public Expense getExpenseById(@PathVariable Long id) {
         return expenseService.getExpenseById(id);
     }
+
     @PutMapping("/{id}")
     public Expense updateExpense(
             @PathVariable Long id,
-            @Valid@RequestBody Expense expense
+            @Valid @RequestBody Expense expense
     ){
-        return expenseService
-                .updateExpense(id, expense);
+        return expenseService.updateExpense(id, expense);
     }
+
     @DeleteMapping("/{id}")
     public void deleteExpense(
             @PathVariable Long id

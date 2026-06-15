@@ -1,5 +1,7 @@
 package com.asutosh.expense_tracker.service;
 
+import com.asutosh.expense_tracker.dto.ExpenseRequestDTO;
+import com.asutosh.expense_tracker.dto.ExpenseResponseDTO;
 import com.asutosh.expense_tracker.entity.Expense;
 import com.asutosh.expense_tracker.exception.ExpenseNotFoundException;
 import com.asutosh.expense_tracker.repository.ExpenseRepository;
@@ -16,8 +18,26 @@ public class ExpenseService {
         this.expenseRepository = expenseRepository;
     }
 
-    public Expense saveExpense(Expense expense){
-        return expenseRepository.save(expense);
+    public ExpenseResponseDTO saveExpense(
+            ExpenseRequestDTO request
+    ) {
+
+        Expense expense = new Expense();
+
+        expense.setTitle(request.getTitle());
+        expense.setAmount(request.getAmount());
+
+        Expense savedExpense =
+                expenseRepository.save(expense);
+
+        ExpenseResponseDTO response =
+                new ExpenseResponseDTO();
+
+        response.setId(savedExpense.getId());
+        response.setTitle(savedExpense.getTitle());
+        response.setAmount(savedExpense.getAmount());
+
+        return response;
     }
 
     public List<Expense> getAllExpenses() {

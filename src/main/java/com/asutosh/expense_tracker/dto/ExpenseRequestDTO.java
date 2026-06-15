@@ -3,6 +3,9 @@ package com.asutosh.expense_tracker.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
+import lombok.Data;
+
+@Data
 public class ExpenseRequestDTO {
 
     @NotBlank
@@ -10,20 +13,4 @@ public class ExpenseRequestDTO {
 
     @Positive
     private Double amount;
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
 }

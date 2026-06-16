@@ -1,5 +1,6 @@
 package com.asutosh.expense_tracker.dto;
 
+import com.asutosh.expense_tracker.entity.Category;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
@@ -13,4 +14,6 @@ public class ExpenseRequestDTO {
 
     @Positive
     private Double amount;
+
+    private Category category;
 }

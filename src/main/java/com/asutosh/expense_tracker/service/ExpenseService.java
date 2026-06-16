@@ -30,6 +30,7 @@ public class ExpenseService {
 
         expense.setTitle(request.getTitle());
         expense.setAmount(request.getAmount());
+        expense.setCategory(request.getCategory());
 
         Expense savedExpense =
                 expenseRepository.save(expense);
@@ -40,6 +41,7 @@ public class ExpenseService {
         response.setId(savedExpense.getId());
         response.setTitle(savedExpense.getTitle());
         response.setAmount(savedExpense.getAmount());
+        response.setCategory(savedExpense.getCategory());
 
         return response;
     }

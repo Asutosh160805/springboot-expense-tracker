@@ -22,4 +22,8 @@ public class Expense {
     private String title;
 
     private Double amount;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

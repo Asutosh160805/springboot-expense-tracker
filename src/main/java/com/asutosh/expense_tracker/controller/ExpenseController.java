@@ -4,12 +4,17 @@ import com.asutosh.expense_tracker.dto.ExpenseRequestDTO;
 import com.asutosh.expense_tracker.dto.ExpenseResponseDTO;
 import com.asutosh.expense_tracker.entity.Expense;
 import com.asutosh.expense_tracker.service.ExpenseService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
+@Tag(
+        name = "Expense Management",
+        description = "APIs for managing expenses"
+)
 @RestController
 @RequestMapping("/expenses")
 public class ExpenseController {
@@ -20,6 +25,10 @@ public class ExpenseController {
         this.expenseService = expenseService;
     }
 
+    @Operation(
+            summary = "Create a new expense",
+            description = "Creates and stores a new expense in the database"
+    )
     @PostMapping
     public ExpenseResponseDTO createExpense(
             @Valid @RequestBody ExpenseRequestDTO request
@@ -27,35 +36,45 @@ public class ExpenseController {
         return expenseService.saveExpense(request);
     }
 
+    @Operation(
+            summary = "Get all expenses",
+            description = "Returns paginated and sorted expenses"
+    )
     @GetMapping
     public Page<Expense> getAllExpenses(
 
-            @RequestParam(
-                    defaultValue = "0"
-            ) int page,
+            @RequestParam(defaultValue = "0")
+            int page,
 
-            @RequestParam(
-                    defaultValue = "5"
-            ) int size,
+            @RequestParam(defaultValue = "5")
+            int size,
 
-            @RequestParam(
-                    defaultValue = "amount"
-            ) String sortBy
+            @RequestParam(defaultValue = "amount")
+            String sortBy
     ) {
 
-        return expenseService
-                .getAllExpenses(
-                        page,
-                        size,
-                        sortBy
-                );
+        return expenseService.getAllExpenses(
+                page,
+                size,
+                sortBy
+        );
     }
 
+    @Operation(
+            summary = "Get expense by ID",
+            description = "Returns a single expense using its ID"
+    )
     @GetMapping("/{id}")
-    public Expense getExpenseById(@PathVariable Long id) {
+    public Expense getExpenseById(
+            @PathVariable Long id
+    ) {
         return expenseService.getExpenseById(id);
     }
 
+    @Operation(
+            summary = "Update an expense",
+            description = "Updates an existing expense using its ID"
+    )
     @PutMapping("/{id}")
     public Expense updateExpense(
             @PathVariable Long id,
@@ -64,6 +83,10 @@ public class ExpenseController {
         return expenseService.updateExpense(id, expense);
     }
 
+    @Operation(
+            summary = "Delete an expense",
+            description = "Deletes an expense using its ID"
+    )
     @DeleteMapping("/{id}")
     public void deleteExpense(
             @PathVariable Long id

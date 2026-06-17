@@ -2,6 +2,7 @@ package com.asutosh.expense_tracker.service;
 
 import com.asutosh.expense_tracker.dto.ExpenseRequestDTO;
 import com.asutosh.expense_tracker.dto.ExpenseResponseDTO;
+import com.asutosh.expense_tracker.entity.Category;
 import com.asutosh.expense_tracker.entity.Expense;
 import com.asutosh.expense_tracker.exception.ExpenseNotFoundException;
 import com.asutosh.expense_tracker.repository.ExpenseRepository;
@@ -68,6 +69,26 @@ public class ExpenseService {
                         new ExpenseNotFoundException(
                                 "Expense not found with id: " + id
                         ));
+    }
+
+    public List<Expense> getExpensesByCategory(
+            Category category
+    ) {
+
+        return expenseRepository
+                .findByCategory(category);
+    }
+
+
+    public List<Expense>
+    getExpensesAboveAmount(
+            Double amount
+    ) {
+
+        return expenseRepository
+                .findByAmountGreaterThan(
+                        amount
+                );
     }
 
     public Expense updateExpense(Long id,

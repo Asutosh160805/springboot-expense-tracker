@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+import com.asutosh.expense_tracker.entity.Category;
+
+import java.util.List;
 
 
 @Tag(
@@ -69,6 +72,33 @@ public class ExpenseController {
             @PathVariable Long id
     ) {
         return expenseService.getExpenseById(id);
+    }
+
+    @GetMapping("/category/{category}")
+    public List<Expense> getExpensesByCategory(
+
+            @PathVariable
+            Category category
+
+    ) {
+
+        return expenseService
+                .getExpensesByCategory(category);
+    }
+
+    @GetMapping("/amount/{amount}")
+    public List<Expense>
+    getExpensesAboveAmount(
+
+            @PathVariable
+            Double amount
+
+    ) {
+
+        return expenseService
+                .getExpensesAboveAmount(
+                        amount
+                );
     }
 
     @Operation(

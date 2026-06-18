@@ -1,6 +1,7 @@
 package com.asutosh.expense_tracker.controller;
 
 import com.asutosh.expense_tracker.dto.LoginRequestDTO;
+import com.asutosh.expense_tracker.dto.LoginResponseDTO;
 import com.asutosh.expense_tracker.dto.RegisterRequestDTO;
 import com.asutosh.expense_tracker.entity.User;
 import com.asutosh.expense_tracker.service.UserService;
@@ -33,16 +34,13 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String loginUser(
-
+    public LoginResponseDTO loginUser(
             @Valid
             @RequestBody
             LoginRequestDTO request
-
     ) {
 
-        return userService.loginUser(
-                request
-        );
+        return userService
+                .loginUser(request);
     }
 }

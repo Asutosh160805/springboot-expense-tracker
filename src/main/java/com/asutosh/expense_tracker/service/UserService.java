@@ -1,6 +1,7 @@
 package com.asutosh.expense_tracker.service;
 
 import com.asutosh.expense_tracker.dto.LoginRequestDTO;
+import com.asutosh.expense_tracker.dto.LoginResponseDTO;
 import com.asutosh.expense_tracker.dto.RegisterRequestDTO;
 import com.asutosh.expense_tracker.entity.User;
 import com.asutosh.expense_tracker.repository.UserRepository;
@@ -12,13 +13,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public UserService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public User registerUser(
@@ -48,7 +52,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public String loginUser(
+    public LoginResponseDTO loginUser(
             LoginRequestDTO request
     ) {
 
@@ -75,6 +79,13 @@ public class UserService {
             );
         }
 
-        return "Login Successful";
+        String token =
+                jwtService.generateToken(
+                        user.getEmail()
+                );
+
+        return new LoginResponseDTO(
+                token
+        );
     }
 }

@@ -52,14 +52,12 @@ public class ExpenseService {
             int size,
             String sortBy
     ) {
-
         Pageable pageable =
                 PageRequest.of(
                         page,
                         size,
                         Sort.by(sortBy)
                 );
-
         return expenseRepository.findAll(pageable);
     }
 

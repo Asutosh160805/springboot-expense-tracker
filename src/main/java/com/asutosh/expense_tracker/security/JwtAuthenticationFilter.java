@@ -7,6 +7,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import java.util.Collections;
 
 import java.io.IOException;
 
@@ -28,10 +31,13 @@ public class JwtAuthenticationFilter
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-
+        System.out.println("JWT FILTER EXECUTED");
         String authHeader =
                 request.getHeader("Authorization");
-
+        System.out.println(
+                "Authorization Header = "
+                        + authHeader
+        );
         if (authHeader == null ||
                 !authHeader.startsWith("Bearer ")) {
 
@@ -47,6 +53,18 @@ public class JwtAuthenticationFilter
 
         String email =
                 jwtService.extractEmail(token);
+
+        UsernamePasswordAuthenticationToken
+                authentication =
+                new UsernamePasswordAuthenticationToken(
+                        email,
+                        null,
+                        Collections.emptyList()
+                );
+
+        SecurityContextHolder
+                .getContext()
+                .setAuthentication(authentication);
 
         System.out.println(
                 "Authenticated User: " + email

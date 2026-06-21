@@ -55,7 +55,6 @@ public class ExpenseController {
             @RequestParam(defaultValue = "amount")
             String sortBy
     ) {
-
         return expenseService.getAllExpenses(
                 page,
                 size,

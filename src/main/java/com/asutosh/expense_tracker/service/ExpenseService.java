@@ -6,6 +6,7 @@ import com.asutosh.expense_tracker.entity.Category;
 import com.asutosh.expense_tracker.entity.Expense;
 import com.asutosh.expense_tracker.entity.User;
 import com.asutosh.expense_tracker.exception.ExpenseNotFoundException;
+import com.asutosh.expense_tracker.exception.UnauthorizedExpenseAccessException;
 import com.asutosh.expense_tracker.repository.ExpenseRepository;
 import com.asutosh.expense_tracker.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -118,15 +119,7 @@ public class ExpenseService {
      * Fetch expense by ID
      */
     public Expense getExpenseById(Long id) {
-
-        return expenseRepository
-                .findById(id)
-                .orElseThrow(
-                        () ->
-                                new ExpenseNotFoundException(
-                                        "Expense not found with id: " + id
-                                )
-                );
+        return getUserExpense(id);
     }
 
     /**
@@ -136,8 +129,14 @@ public class ExpenseService {
             Category category
     ) {
 
+        User user =
+                getCurrentUser();
+
         return expenseRepository
-                .findByCategory(category);
+                .findByUserEmailAndCategory(
+                        user.getEmail(),
+                        category
+                );
     }
 
     /**
@@ -147,8 +146,14 @@ public class ExpenseService {
             Double amount
     ) {
 
+        User user =
+                getCurrentUser();
+
         return expenseRepository
-                .findByAmountGreaterThan(amount);
+                .findByUserEmailAndAmountGreaterThan(
+                        user.getEmail(),
+                        amount
+                );
     }
 
     /**
@@ -159,15 +164,7 @@ public class ExpenseService {
             Expense updatedExpense
     ) {
 
-        Expense expense =
-                expenseRepository
-                        .findById(id)
-                        .orElseThrow(
-                                () ->
-                                        new ExpenseNotFoundException(
-                                                "Expense not found with id: " + id
-                                        )
-                        );
+        Expense expense = getUserExpense(id);
 
         expense.setTitle(
                 updatedExpense.getTitle()
@@ -191,13 +188,55 @@ public class ExpenseService {
             Long id
     ) {
 
-        if (!expenseRepository.existsById(id)) {
+        Expense expense =
+                getUserExpense(id);
 
-            throw new ExpenseNotFoundException(
-                    "Expense not found with id: " + id
+        expenseRepository.deleteById(id);
+    }
+
+    private User getCurrentUser() {
+
+        String email =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName();
+
+        return userRepository
+                .findByEmail(email)
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "User not found"
+                        )
+                );
+    }
+
+    private Expense getUserExpense(
+            Long expenseId
+    ) {
+
+        Expense expense =
+                expenseRepository
+                        .findById(expenseId)
+                        .orElseThrow(
+                                () ->
+                                        new ExpenseNotFoundException(
+                                                "Expense not found"
+                                        )
+                        );
+
+        User currentUser =
+                getCurrentUser();
+
+        if (!expense.getUser()
+                .getId()
+                .equals(currentUser.getId())) {
+
+            throw new UnauthorizedExpenseAccessException(
+                    "You do not own this expense"
             );
         }
 
-        expenseRepository.deleteById(id);
+        return expense;
     }
 }

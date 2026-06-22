@@ -24,4 +24,12 @@ public interface ExpenseRepository
     List<Expense> findByAmountGreaterThan(
             Double amount
     );
+    List<Expense> findByUserEmailAndCategory(
+            String email,
+            Category category
+    );
+    List<Expense> findByUserEmailAndAmountGreaterThan(
+            String email,
+            Double amount
+    );
 }

@@ -10,7 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import com.asutosh.expense_tracker.entity.Category;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 
 
@@ -20,6 +20,7 @@ import java.util.List;
 )
 @RestController
 @RequestMapping("/expenses")
+@SecurityRequirement(name = "bearerAuth")
 public class ExpenseController {
 
     private final ExpenseService expenseService;

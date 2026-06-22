@@ -2,7 +2,7 @@ package com.asutosh.expense_tracker.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 
 @Entity
@@ -23,10 +23,13 @@ public class User {
 
     private String email;
 
+    @JsonIgnore
     private String password;
 
     @OneToMany(
             mappedBy = "user"
     )
+    @JsonIgnore
     private List<Expense> expenses;
+
 }

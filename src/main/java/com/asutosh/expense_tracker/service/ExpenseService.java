@@ -16,6 +16,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -81,7 +83,13 @@ public class ExpenseService {
         response.setTitle(savedExpense.getTitle());
         response.setAmount(savedExpense.getAmount());
         response.setCategory(savedExpense.getCategory());
+        response.setExpenseDate(
+                savedExpense.getExpenseDate()
+        );
 
+        response.setCreatedAt(
+                savedExpense.getCreatedAt()
+        );
         return response;
     }
 

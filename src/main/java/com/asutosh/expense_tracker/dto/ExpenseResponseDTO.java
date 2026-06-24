@@ -3,6 +3,8 @@ package com.asutosh.expense_tracker.dto;
 
 import com.asutosh.expense_tracker.entity.Category;
 import lombok.Data;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class ExpenseResponseDTO {
@@ -14,4 +16,8 @@ public class ExpenseResponseDTO {
     private Double amount;
 
     private Category category;
+
+    private LocalDate expenseDate;
+
+    private LocalDateTime createdAt;
 }

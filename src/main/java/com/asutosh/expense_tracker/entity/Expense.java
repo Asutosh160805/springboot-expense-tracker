@@ -8,7 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -31,4 +32,18 @@ public class Expense {
 
     @Enumerated(EnumType.STRING)
     private Category category;
+
+    private LocalDate expenseDate;
+
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist() {
+
+        this.expenseDate =
+                LocalDate.now();
+
+        this.createdAt =
+                LocalDateTime.now();
+    }
 }

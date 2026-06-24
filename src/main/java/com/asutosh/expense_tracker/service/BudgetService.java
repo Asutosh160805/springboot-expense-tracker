@@ -9,19 +9,27 @@ import com.asutosh.expense_tracker.repository.BudgetRepository;
 import com.asutosh.expense_tracker.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.asutosh.expense_tracker.repository.ExpenseRepository;
+import com.asutosh.expense_tracker.dto.DashboardResponseDTO;
+
+import java.time.LocalDate;
+import java.time.Month;
 
 @Service
 public class BudgetService {
 
     private final BudgetRepository budgetRepository;
     private final UserRepository userRepository;
+    private final ExpenseRepository expenseRepository;
 
     public BudgetService(
             BudgetRepository budgetRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            ExpenseRepository expenseRepository
     ) {
         this.budgetRepository = budgetRepository;
         this.userRepository = userRepository;
+        this.expenseRepository = expenseRepository;
     }
 
     // Create budget
@@ -109,6 +117,68 @@ public class BudgetService {
         response.setAmount(budget.getAmount());
         response.setMonth(budget.getMonth());
         response.setYear(budget.getYear());
+
+        return response;
+    }
+    public DashboardResponseDTO getDashboard() {
+
+        User user = getCurrentUser();
+
+        Month currentMonth =
+                LocalDate.now().getMonth();
+
+        Integer currentYear =
+                LocalDate.now().getYear();
+
+        Budget budget =
+                budgetRepository
+                        .findByUserEmailAndMonthAndYear(
+                                user.getEmail(),
+                                currentMonth,
+                                currentYear
+                        )
+                        .orElseThrow(
+                                () -> new BudgetNotFoundException(
+                                        "No budget found for current month"
+                                )
+                        );
+
+        LocalDate startDate =
+                LocalDate.now()
+                        .withDayOfMonth(1);
+
+        LocalDate endDate =
+                LocalDate.now()
+                        .withDayOfMonth(
+                                LocalDate.now()
+                                        .lengthOfMonth()
+                        );
+
+        Double spent =
+                expenseRepository
+                        .getTotalSpentForPeriod(
+                                user.getEmail(),
+                                startDate,
+                                endDate
+                        );
+
+        Double remaining =
+                budget.getAmount() - spent;
+
+        DashboardResponseDTO response =
+                new DashboardResponseDTO();
+
+        response.setBudget(
+                budget.getAmount()
+        );
+
+        response.setSpent(
+                spent
+        );
+
+        response.setRemaining(
+                remaining
+        );
 
         return response;
     }

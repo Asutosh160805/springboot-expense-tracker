@@ -6,6 +6,7 @@ import com.asutosh.expense_tracker.service.BudgetService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import com.asutosh.expense_tracker.dto.DashboardResponseDTO;
 
 @RestController
 @RequestMapping("/budgets")
@@ -35,5 +36,12 @@ public class BudgetController {
 
         return budgetService
                 .getCurrentBudget();
+    }
+
+    @GetMapping("/status")
+    public DashboardResponseDTO getDashboard() {
+
+        return budgetService
+                .getDashboard();
     }
 }

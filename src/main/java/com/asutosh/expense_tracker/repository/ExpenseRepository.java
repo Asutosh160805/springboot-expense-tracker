@@ -5,6 +5,7 @@ import com.asutosh.expense_tracker.entity.Expense;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import com.asutosh.expense_tracker.dto.CategoryReportDTO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -43,6 +44,23 @@ public interface ExpenseRepository
         AND e.expenseDate BETWEEN :startDate AND :endDate
         """)
     Double getTotalSpentForPeriod(
+            @Param("email") String email,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query("""
+        SELECT new com.asutosh.expense_tracker.dto.CategoryReportDTO(
+        e.category,
+        SUM(e.amount)
+        )
+        FROM Expense e
+        WHERE e.user.email = :email
+        AND e.expenseDate BETWEEN :startDate AND :endDate
+        GROUP BY e.category
+        ORDER BY SUM(e.amount) DESC
+        """)
+    List<CategoryReportDTO> getMonthlyCategoryReport(
             @Param("email") String email,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate

@@ -2,6 +2,7 @@ package com.asutosh.expense_tracker.service;
 
 import com.asutosh.expense_tracker.dto.BudgetRequestDTO;
 import com.asutosh.expense_tracker.dto.BudgetResponseDTO;
+import com.asutosh.expense_tracker.dto.CategoryReportDTO;
 import com.asutosh.expense_tracker.entity.Budget;
 import com.asutosh.expense_tracker.entity.User;
 import com.asutosh.expense_tracker.exception.BudgetNotFoundException;
@@ -14,6 +15,7 @@ import com.asutosh.expense_tracker.dto.DashboardResponseDTO;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
 
 @Service
 public class BudgetService {
@@ -181,5 +183,27 @@ public class BudgetService {
         );
 
         return response;
+    }
+    public List<CategoryReportDTO> getMonthlyReport() {
+
+        User user = getCurrentUser();
+
+        LocalDate startDate =
+                LocalDate.now()
+                        .withDayOfMonth(1);
+
+        LocalDate endDate =
+                LocalDate.now()
+                        .withDayOfMonth(
+                                LocalDate.now()
+                                        .lengthOfMonth()
+                        );
+
+        return expenseRepository
+                .getMonthlyCategoryReport(
+                        user.getEmail(),
+                        startDate,
+                        endDate
+                );
     }
 }

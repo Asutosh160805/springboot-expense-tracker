@@ -7,6 +7,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import com.asutosh.expense_tracker.dto.DashboardResponseDTO;
+import com.asutosh.expense_tracker.dto.CategoryReportDTO;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/budgets")
@@ -43,5 +46,12 @@ public class BudgetController {
 
         return budgetService
                 .getDashboard();
+    }
+
+    @GetMapping("/reports/monthly")
+    public List<CategoryReportDTO> getMonthlyReport() {
+
+        return budgetService
+                .getMonthlyReport();
     }
 }

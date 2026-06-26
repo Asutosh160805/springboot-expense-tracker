@@ -7,6 +7,7 @@ import com.asutosh.expense_tracker.entity.Expense;
 import com.asutosh.expense_tracker.entity.User;
 import com.asutosh.expense_tracker.exception.ExpenseNotFoundException;
 import com.asutosh.expense_tracker.exception.UnauthorizedExpenseAccessException;
+import com.asutosh.expense_tracker.mapper.ExpenseMapper;
 import com.asutosh.expense_tracker.repository.ExpenseRepository;
 import com.asutosh.expense_tracker.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -15,9 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,12 +27,16 @@ public class ExpenseService {
     // Repository used to fetch logged-in user
     private final UserRepository userRepository;
 
+    private final ExpenseMapper expenseMapper;
+
     public ExpenseService(
             ExpenseRepository expenseRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            ExpenseMapper expenseMapper
     ) {
         this.expenseRepository = expenseRepository;
         this.userRepository = userRepository;
+        this.expenseMapper = expenseMapper;
     }
 
     /**
@@ -44,22 +46,8 @@ public class ExpenseService {
             ExpenseRequestDTO request
     ) {
 
-        // Get email from Security Context
-        String email =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getName();
-
-        // Find the logged-in user
         User user =
-                userRepository
-                        .findByEmail(email)
-                        .orElseThrow(
-                                () -> new RuntimeException(
-                                        "User not found"
-                                )
-                        );
+                getCurrentUser();
 
         // Create expense entity
         Expense expense = new Expense();
@@ -79,24 +67,18 @@ public class ExpenseService {
         ExpenseResponseDTO response =
                 new ExpenseResponseDTO();
 
-        response.setId(savedExpense.getId());
-        response.setTitle(savedExpense.getTitle());
-        response.setAmount(savedExpense.getAmount());
-        response.setCategory(savedExpense.getCategory());
-        response.setExpenseDate(
-                savedExpense.getExpenseDate()
+        return expenseMapper.toDTO(
+                savedExpense
         );
-
-        response.setCreatedAt(
-                savedExpense.getCreatedAt()
-        );
-        return response;
     }
 
     /**
      * Return only expenses belonging to logged-in user
      */
-    public Page<Expense> getAllExpenses(
+    /**
+     * Return paginated expenses belonging to the logged-in user
+     */
+    public Page<ExpenseResponseDTO> getAllExpenses(
             int page,
             int size,
             String sortBy
@@ -109,88 +91,116 @@ public class ExpenseService {
                         Sort.by(sortBy)
                 );
 
-        // Current authenticated user's email
-        String email =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getName();
+        User currentUser =
+                getCurrentUser();
 
         return expenseRepository
                 .findByUserEmail(
-                        email,
+                        currentUser.getEmail(),
                         pageable
-                );
+                )
+                .map(expenseMapper::toDTO);
     }
 
     /**
      * Fetch expense by ID
      */
-    public Expense getExpenseById(Long id) {
-        return getUserExpense(id);
+    /**
+     * Return a single expense belonging to the logged-in user
+     */
+    public ExpenseResponseDTO getExpenseById(
+            Long id
+    ) {
+
+        Expense expense =
+                getUserExpense(id);
+
+        return expenseMapper.toDTO(
+                expense
+        );
     }
 
+
     /**
-     * Get expenses by category
+     * Return all expenses of a category
+     * belonging to the logged-in user
      */
-    public List<Expense> getExpensesByCategory(
+    public List<ExpenseResponseDTO> getExpensesByCategory(
             Category category
     ) {
 
-        User user =
+        User currentUser =
                 getCurrentUser();
 
         return expenseRepository
                 .findByUserEmailAndCategory(
-                        user.getEmail(),
+                        currentUser.getEmail(),
                         category
-                );
+                )
+                .stream()
+                .map(expenseMapper::toDTO)
+                .toList();
     }
 
+
     /**
-     * Get expenses greater than amount
+     * Return expenses greater than the given amount
      */
-    public List<Expense> getExpensesAboveAmount(
+    public List<ExpenseResponseDTO> getExpensesAboveAmount(
             Double amount
     ) {
 
-        User user =
+        User currentUser =
                 getCurrentUser();
 
         return expenseRepository
                 .findByUserEmailAndAmountGreaterThan(
-                        user.getEmail(),
+                        currentUser.getEmail(),
                         amount
-                );
+                )
+                .stream()
+                .map(expenseMapper::toDTO)
+                .toList();
     }
 
     /**
-     * Update expense
+     * Update an existing expense
      */
-    public Expense updateExpense(
+    public ExpenseResponseDTO updateExpense(
+
             Long id,
-            Expense updatedExpense
+
+            ExpenseRequestDTO request
+
     ) {
 
-        Expense expense = getUserExpense(id);
+        Expense expense =
+                getUserExpense(id);
 
         expense.setTitle(
-                updatedExpense.getTitle()
+                request.getTitle()
         );
 
         expense.setAmount(
-                updatedExpense.getAmount()
+                request.getAmount()
         );
 
         expense.setCategory(
-                updatedExpense.getCategory()
+                request.getCategory()
         );
 
-        return expenseRepository.save(expense);
+        Expense updatedExpense =
+                expenseRepository.save(
+                        expense
+                );
+
+        return expenseMapper.toDTO(
+                updatedExpense
+        );
     }
 
     /**
-     * Delete expense
+     * Delete an expense owned by the logged-in user
      */
     public void deleteExpense(
             Long id
@@ -199,7 +209,7 @@ public class ExpenseService {
         Expense expense =
                 getUserExpense(id);
 
-        expenseRepository.deleteById(id);
+        expenseRepository.delete(expense);
     }
 
     private User getCurrentUser() {

@@ -2,50 +2,64 @@ package com.asutosh.expense_tracker.controller;
 
 import com.asutosh.expense_tracker.dto.ExpenseRequestDTO;
 import com.asutosh.expense_tracker.dto.ExpenseResponseDTO;
-import com.asutosh.expense_tracker.entity.Expense;
+import com.asutosh.expense_tracker.entity.Category;
 import com.asutosh.expense_tracker.service.ExpenseService;
+
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
+
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-import com.asutosh.expense_tracker.entity.Category;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import java.util.List;
 
+import java.util.List;
 
 @Tag(
         name = "Expense Management",
-        description = "APIs for managing expenses"
+        description = "APIs for creating, retrieving, updating and deleting user expenses"
 )
 @RestController
 @RequestMapping("/expenses")
 @SecurityRequirement(name = "bearerAuth")
 public class ExpenseController {
 
+    // Service layer handles all business logic
     private final ExpenseService expenseService;
 
-    public ExpenseController(ExpenseService expenseService){
+    public ExpenseController(
+            ExpenseService expenseService
+    ) {
         this.expenseService = expenseService;
     }
 
+    // ==========================================================
+    // CREATE
+    // ==========================================================
+
     @Operation(
-            summary = "Create a new expense",
-            description = "Creates and stores a new expense in the database"
+            summary = "Create Expense",
+            description = "Creates a new expense for the authenticated user"
     )
     @PostMapping
     public ExpenseResponseDTO createExpense(
             @Valid @RequestBody ExpenseRequestDTO request
-    ){
+    ) {
+
         return expenseService.saveExpense(request);
     }
 
+    // ==========================================================
+    // READ
+    // ==========================================================
+
     @Operation(
-            summary = "Get all expenses",
-            description = "Returns paginated and sorted expenses"
+            summary = "Get All Expenses",
+            description = "Returns paginated expenses of the logged-in user"
     )
     @GetMapping
-    public Page<Expense> getAllExpenses(
+    public Page<ExpenseResponseDTO> getAllExpenses(
 
             @RequestParam(defaultValue = "0")
             int page,
@@ -56,6 +70,7 @@ public class ExpenseController {
             @RequestParam(defaultValue = "amount")
             String sortBy
     ) {
+
         return expenseService.getAllExpenses(
                 page,
                 size,
@@ -64,18 +79,23 @@ public class ExpenseController {
     }
 
     @Operation(
-            summary = "Get expense by ID",
-            description = "Returns a single expense using its ID"
+            summary = "Get Expense By ID",
+            description = "Returns a single expense belonging to the authenticated user"
     )
     @GetMapping("/{id}")
-    public Expense getExpenseById(
+    public ExpenseResponseDTO getExpenseById(
             @PathVariable Long id
     ) {
+
         return expenseService.getExpenseById(id);
     }
 
+    @Operation(
+            summary = "Filter By Category",
+            description = "Returns expenses of the logged-in user for a specific category"
+    )
     @GetMapping("/category/{category}")
-    public List<Expense> getExpensesByCategory(
+    public List<ExpenseResponseDTO> getExpensesByCategory(
 
             @PathVariable
             Category category
@@ -86,9 +106,12 @@ public class ExpenseController {
                 .getExpensesByCategory(category);
     }
 
+    @Operation(
+            summary = "Filter By Amount",
+            description = "Returns expenses greater than the specified amount"
+    )
     @GetMapping("/amount/{amount}")
-    public List<Expense>
-    getExpensesAboveAmount(
+    public List<ExpenseResponseDTO> getExpensesAboveAmount(
 
             @PathVariable
             Double amount
@@ -96,31 +119,51 @@ public class ExpenseController {
     ) {
 
         return expenseService
-                .getExpensesAboveAmount(
-                        amount
-                );
+                .getExpensesAboveAmount(amount);
     }
 
+    // ==========================================================
+    // UPDATE
+    // ==========================================================
+
     @Operation(
-            summary = "Update an expense",
-            description = "Updates an existing expense using its ID"
+            summary = "Update Expense",
+            description = "Updates an existing expense"
     )
     @PutMapping("/{id}")
-    public Expense updateExpense(
-            @PathVariable Long id,
-            @Valid @RequestBody Expense expense
-    ){
-        return expenseService.updateExpense(id, expense);
+    public ExpenseResponseDTO updateExpense(
+
+            @PathVariable
+            Long id,
+
+            @Valid
+            @RequestBody
+            ExpenseRequestDTO request
+
+    ) {
+
+        return expenseService.updateExpense(
+                id,
+                request
+        );
     }
 
+    // ==========================================================
+    // DELETE
+    // ==========================================================
+
     @Operation(
-            summary = "Delete an expense",
-            description = "Deletes an expense using its ID"
+            summary = "Delete Expense",
+            description = "Deletes an expense belonging to the authenticated user"
     )
     @DeleteMapping("/{id}")
     public void deleteExpense(
-            @PathVariable Long id
-    ){
+
+            @PathVariable
+            Long id
+
+    ) {
+
         expenseService.deleteExpense(id);
     }
 }

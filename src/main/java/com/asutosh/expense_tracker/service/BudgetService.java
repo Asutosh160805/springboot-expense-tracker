@@ -1,8 +1,6 @@
 package com.asutosh.expense_tracker.service;
 
-import com.asutosh.expense_tracker.dto.BudgetRequestDTO;
-import com.asutosh.expense_tracker.dto.BudgetResponseDTO;
-import com.asutosh.expense_tracker.dto.CategoryReportDTO;
+import com.asutosh.expense_tracker.dto.*;
 import com.asutosh.expense_tracker.entity.Budget;
 import com.asutosh.expense_tracker.entity.User;
 import com.asutosh.expense_tracker.exception.BudgetNotFoundException;
@@ -11,7 +9,7 @@ import com.asutosh.expense_tracker.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.asutosh.expense_tracker.repository.ExpenseRepository;
-import com.asutosh.expense_tracker.dto.DashboardResponseDTO;
+import com.asutosh.expense_tracker.entity.BudgetStatus;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -205,5 +203,113 @@ public class BudgetService {
                         startDate,
                         endDate
                 );
+    }
+
+    /**
+     * Returns the current month's budget status.
+     */
+    public BudgetStatusDTO getBudgetStatus() {
+
+        User currentUser = getCurrentUser();
+
+        LocalDate today = LocalDate.now();
+
+        LocalDate firstDay =
+                today.withDayOfMonth(1);
+
+        LocalDate lastDay =
+                today.withDayOfMonth(
+                        today.lengthOfMonth()
+                );
+
+        Budget budget =
+                budgetRepository
+                        .findByUserEmailAndMonthAndYear(
+                                currentUser.getEmail(),
+                                today.getMonth(),
+                                today.getYear()
+                        )
+                        .orElseThrow(
+                                () -> new BudgetNotFoundException(
+                                        "No budget found for current month"
+                                )
+                        );
+
+        Double spent =
+                expenseRepository
+                        .getTotalSpentForPeriod(
+                                currentUser.getEmail(),
+                                firstDay,
+                                lastDay
+                        );
+
+        Double remaining =
+                budget.getAmount() - spent;
+
+        Integer percentageUsed =
+                (int) Math.round(
+                        (spent / budget.getAmount()) * 100
+                );
+
+        BudgetStatusDTO response =
+                new BudgetStatusDTO();
+
+        response.setBudget(
+                budget.getAmount()
+        );
+
+        response.setSpent(
+                spent
+        );
+
+        response.setRemaining(
+                remaining
+        );
+
+        response.setPercentageUsed(
+                percentageUsed
+        );
+
+        response.setOverspent(
+                spent > budget.getAmount()
+        );
+
+        if (percentageUsed >= 100) {
+
+            response.setStatus(BudgetStatus.EXCEEDED);
+            response.setColor("RED");
+
+            response.setMessage(
+                    "⚠ Budget exceeded by ₹"
+                            + Math.abs(remaining)
+            );
+
+        }
+        else if (percentageUsed >= 80) {
+
+            response.setStatus(BudgetStatus.WARNING);
+            response.setColor("YELLOW");
+
+            response.setMessage(
+                    "⚠ You have used "
+                            + percentageUsed
+                            + "% of your monthly budget."
+            );
+
+        }
+        else {
+
+            response.setStatus(BudgetStatus.SAFE);
+            response.setColor("GREEN");
+
+            response.setMessage(
+                    "Great! You still have ₹"
+                            + remaining
+                            + " remaining."
+            );
+
+        }
+
+        return response;
     }
 }

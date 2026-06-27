@@ -1,13 +1,10 @@
 package com.asutosh.expense_tracker.controller;
 
-import com.asutosh.expense_tracker.dto.BudgetRequestDTO;
-import com.asutosh.expense_tracker.dto.BudgetResponseDTO;
+import com.asutosh.expense_tracker.dto.*;
 import com.asutosh.expense_tracker.service.BudgetService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-import com.asutosh.expense_tracker.dto.DashboardResponseDTO;
-import com.asutosh.expense_tracker.dto.CategoryReportDTO;
 
 import java.util.List;
 
@@ -42,10 +39,10 @@ public class BudgetController {
     }
 
     @GetMapping("/status")
-    public DashboardResponseDTO getDashboard() {
+    public BudgetStatusDTO getBudgetStatus() {
 
         return budgetService
-                .getDashboard();
+                .getBudgetStatus();
     }
 
     @GetMapping("/reports/monthly")

@@ -1,4 +1,3 @@
-version: "3.9"
 
 services:
 
@@ -22,9 +21,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
 
   app:
-
-    image: expense-tracker
-
+    build: .
     container_name: expense-app
 
     depends_on:

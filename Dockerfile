@@ -1,11 +1,16 @@
 # ---------- Build Stage ----------
-FROM gradle:8.8-jdk21 AS builder
+FROM eclipse-temurin:21-jdk AS builder
 
 WORKDIR /app
 
+# Copy the project
 COPY . .
 
-RUN gradle clean bootJar -x test
+# Make Gradle Wrapper executable
+RUN chmod +x gradlew
+
+# Build the application
+RUN ./gradlew clean bootJar -x test
 
 # ---------- Runtime Stage ----------
 FROM eclipse-temurin:21-jre

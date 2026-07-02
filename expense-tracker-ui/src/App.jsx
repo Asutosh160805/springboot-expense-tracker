@@ -1,19 +1,26 @@
-import Navbar from "./components/Navbar";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
+    return (
+        <div>
 
-  return (
+            <Header
 
-      <div>
+                title="Expense Tracker"
 
-        <Navbar />
+                username="Asutosh"
 
-        <h1>Dashboard</h1>
+            />
 
-      </div>
 
-  );
+            <h2>Dashboard</h2>
 
+            <Footer />
+
+        </div>
+    );
 }
 
 export default App;

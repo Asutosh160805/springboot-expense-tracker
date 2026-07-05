@@ -1,10 +1,32 @@
-function Dashboard(){
+import Sidebar from "../components/Sidebar";
+import DashboardCard from "../components/DashboardCard";
 
-    return(
+function Dashboard() {
+
+    return (
 
         <div>
 
-            <h2>Dashboard Page</h2>
+            <Sidebar />
+
+            <main>
+
+                <DashboardCard
+                    title="Monthly Budget"
+                    value="₹5000"
+                />
+
+                <DashboardCard
+                    title="Spent"
+                    value="₹2500"
+                />
+
+                <DashboardCard
+                    title="Remaining"
+                    value="₹2500"
+                />
+
+            </main>
 
         </div>
 

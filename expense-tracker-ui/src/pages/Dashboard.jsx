@@ -33,9 +33,17 @@ function Dashboard() {
 
                 <section className="transactions">
 
-                    <h2>Recent Transactions</h2>
+                    <h2>
 
-                    <p>No transactions available.</p>
+                        Recent Transactions
+
+                    </h2>
+
+                    <p>
+
+                        No transactions yet.
+
+                    </p>
 
                 </section>
 

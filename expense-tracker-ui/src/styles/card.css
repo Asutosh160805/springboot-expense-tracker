@@ -1,13 +1,17 @@
-.dashboard-card {
+.dashboard-card{
 
-    border: 1px solid #ddd;
+    background:white;
 
-    border-radius: 10px;
+    border-radius:12px;
 
-    padding: 20px;
+    padding:20px;
 
-    width: 220px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
 
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.dashboard-card:hover{
+
+    transform:translateY(-4px);
 
 }

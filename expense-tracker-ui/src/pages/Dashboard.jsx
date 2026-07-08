@@ -1,30 +1,43 @@
 import Sidebar from "../components/Sidebar";
 import DashboardCard from "../components/DashboardCard";
+import "../styles/dashboard.css";
 
 function Dashboard() {
 
     return (
 
-        <div>
+        <div className="dashboard">
 
             <Sidebar />
 
-            <main>
+            <main className="content">
 
-                <DashboardCard
-                    title="Monthly Budget"
-                    value="₹5000"
-                />
+                <div className="cards">
 
-                <DashboardCard
-                    title="Spent"
-                    value="₹2500"
-                />
+                    <DashboardCard
+                        title="Monthly Budget"
+                        value="₹5000"
+                    />
 
-                <DashboardCard
-                    title="Remaining"
-                    value="₹2500"
-                />
+                    <DashboardCard
+                        title="Spent"
+                        value="₹2500"
+                    />
+
+                    <DashboardCard
+                        title="Remaining"
+                        value="₹2500"
+                    />
+
+                </div>
+
+                <section className="transactions">
+
+                    <h2>Recent Transactions</h2>
+
+                    <p>No transactions available.</p>
+
+                </section>
 
             </main>
 

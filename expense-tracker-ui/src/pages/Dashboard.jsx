@@ -4,6 +4,57 @@ import "../styles/dashboard.css";
 
 function Dashboard() {
 
+    const cards = [
+        {
+            id: 1,
+            title: "Monthly Budget",
+            value: "₹15000"
+        },
+        {
+            id: 2,
+            title: "Spent",
+            value: "₹6200"
+        },
+        {
+            id: 3,
+            title: "Remaining",
+            value: "₹8800"
+        },
+        {
+            id: 4,
+            title: "Savings",
+            value: "₹5000"
+        }
+    ];
+
+    const transactions = [
+        {
+            id: 1,
+            title: "Netflix",
+            amount: "₹649"
+        },
+        {
+            id: 2,
+            title: "Dominos",
+            amount: "₹699"
+        },
+        {
+            id: 3,
+            title: "Electricity Bill",
+            amount: "₹3000"
+        },
+        {
+            id: 4,
+            title: "Spotify",
+            amount: "₹119"
+        },
+        {
+             id: 5,
+             title: "Fruits",
+             amount: "₹299"
+        }
+    ];
+
     return (
 
         <div className="dashboard">
@@ -14,36 +65,40 @@ function Dashboard() {
 
                 <div className="cards">
 
-                    <DashboardCard
-                        title="Monthly Budget"
-                        value="₹5000"
-                    />
+                    {cards.map(card => (
 
-                    <DashboardCard
-                        title="Spent"
-                        value="₹2500"
-                    />
+                        <DashboardCard
+                            key={card.id}
+                            title={card.title}
+                            value={card.value}
+                        />
 
-                    <DashboardCard
-                        title="Remaining"
-                        value="₹2500"
-                    />
+                    ))}
 
                 </div>
 
                 <section className="transactions">
 
-                    <h2>
+                    <h2>Recent Transactions</h2>
 
-                        Recent Transactions
+                    <div className="transaction-list">
 
-                    </h2>
+                        {transactions.map((transaction) => (
 
-                    <p>
+                            <div
+                                key={transaction.id}
+                                className="transaction-item"
+                            >
 
-                        No transactions yet.
+                                <span>{transaction.title}</span>
 
-                    </p>
+                                <span>{transaction.amount}</span>
+
+                            </div>
+
+                        ))}
+
+                    </div>
 
                 </section>
 

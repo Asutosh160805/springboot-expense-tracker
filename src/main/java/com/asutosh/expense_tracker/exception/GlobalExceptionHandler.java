@@ -22,6 +22,19 @@ public class GlobalExceptionHandler {
                 ex.getMessage()
         );
     }
+
+    @ExceptionHandler(
+            BudgetNotFoundException.class
+    )
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleBudgetNotFound(
+            BudgetNotFoundException ex
+    ) {
+        return Map.of(
+                "message",
+                ex.getMessage()
+        );
+    }
 }
 
 

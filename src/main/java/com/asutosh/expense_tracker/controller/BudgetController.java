@@ -4,6 +4,7 @@ import com.asutosh.expense_tracker.dto.*;
 import com.asutosh.expense_tracker.service.BudgetService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,10 +33,15 @@ public class BudgetController {
                 .createBudget(request);
     }
     @GetMapping("/current")
-    public BudgetResponseDTO getCurrentBudget() {
+    public ResponseEntity<BudgetResponseDTO> getCurrentBudget() {
 
-        return budgetService
-                .getCurrentBudget();
+        BudgetResponseDTO budget = budgetService.getCurrentBudget();
+
+        if (budget == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(budget);
     }
 
     @GetMapping("/status")

@@ -14,6 +14,7 @@ import com.asutosh.expense_tracker.entity.BudgetStatus;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BudgetService {
@@ -93,34 +94,27 @@ public class BudgetService {
                 );
     }
 
-    public BudgetResponseDTO getCurrentBudget() {
+public BudgetResponseDTO getCurrentBudget() {
 
         User user = getCurrentUser();
 
-        Budget budget =
-                budgetRepository
-                        .findByUserEmailAndMonthAndYear(
-                                user.getEmail(),
-                                java.time.LocalDate.now().getMonth(),
-                                java.time.LocalDate.now().getYear()
-                        )
-                        .orElseThrow(
-                                () -> new BudgetNotFoundException(
-                                        "No budget found for current month"
-                            )
-                        );
-
-        BudgetResponseDTO response =
-                new BudgetResponseDTO();
-
-        response.setId(budget.getId());
-        response.setAmount(budget.getAmount());
-        response.setMonth(budget.getMonth());
-        response.setYear(budget.getYear());
-
-        return response;
+        return budgetRepository
+                .findByUserEmailAndMonthAndYear(
+                        user.getEmail(),
+                        java.time.LocalDate.now().getMonth(),
+                        java.time.LocalDate.now().getYear()
+                )
+                .map(budget -> {
+                    BudgetResponseDTO response = new BudgetResponseDTO();
+                    response.setId(budget.getId());
+                    response.setAmount(budget.getAmount());
+                    response.setMonth(budget.getMonth());
+                    response.setYear(budget.getYear());
+                    return response;
+                })
+                .orElse(null);
     }
-    public DashboardResponseDTO getDashboard() {
+public DashboardResponseDTO getDashboard() {
 
         User user = getCurrentUser();
 
@@ -130,18 +124,23 @@ public class BudgetService {
         Integer currentYear =
                 LocalDate.now().getYear();
 
-        Budget budget =
+        Optional<Budget> budgetOpt =
                 budgetRepository
                         .findByUserEmailAndMonthAndYear(
                                 user.getEmail(),
                                 currentMonth,
                                 currentYear
-                        )
-                        .orElseThrow(
-                                () -> new BudgetNotFoundException(
-                                        "No budget found for current month"
-                                )
                         );
+
+        if (budgetOpt.isEmpty()) {
+            DashboardResponseDTO response = new DashboardResponseDTO();
+            response.setBudget(0.0);
+            response.setSpent(0.0);
+            response.setRemaining(0.0);
+            return response;
+        }
+
+        Budget budget = budgetOpt.get();
 
         LocalDate startDate =
                 LocalDate.now()
@@ -205,10 +204,7 @@ public class BudgetService {
                 );
     }
 
-    /**
-     * Returns the current month's budget status.
-     */
-    public BudgetStatusDTO getBudgetStatus() {
+public BudgetStatusDTO getBudgetStatus() {
 
         User currentUser = getCurrentUser();
 
@@ -222,18 +218,28 @@ public class BudgetService {
                         today.lengthOfMonth()
                 );
 
-        Budget budget =
+        Optional<Budget> budgetOpt =
                 budgetRepository
                         .findByUserEmailAndMonthAndYear(
                                 currentUser.getEmail(),
                                 today.getMonth(),
                                 today.getYear()
-                        )
-                        .orElseThrow(
-                                () -> new BudgetNotFoundException(
-                                        "No budget found for current month"
-                                )
                         );
+
+        if (budgetOpt.isEmpty()) {
+            BudgetStatusDTO response = new BudgetStatusDTO();
+            response.setBudget(0.0);
+            response.setSpent(0.0);
+            response.setRemaining(0.0);
+            response.setPercentageUsed(0);
+            response.setOverspent(false);
+            response.setStatus(BudgetStatus.SAFE);
+            response.setColor("GREEN");
+            response.setMessage("No budget set for this month. Create a budget to start tracking.");
+            return response;
+        }
+
+        Budget budget = budgetOpt.get();
 
         Double spent =
                 expenseRepository

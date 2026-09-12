@@ -4,6 +4,9 @@ import com.asutosh.expense_tracker.dto.LoginRequestDTO;
 import com.asutosh.expense_tracker.dto.LoginResponseDTO;
 import com.asutosh.expense_tracker.dto.RegisterRequestDTO;
 import com.asutosh.expense_tracker.entity.User;
+import com.asutosh.expense_tracker.exception.UnAuthorizedUserException;
+import com.asutosh.expense_tracker.exception.UserAlreadyExistsException;
+import com.asutosh.expense_tracker.exception.UserNotFoundException;
 import com.asutosh.expense_tracker.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,8 +36,8 @@ public class UserService {
                 .findByEmail(request.getEmail())
                 .isPresent()) {
 
-            throw new RuntimeException(
-                    "Email already exists"
+            throw new UserAlreadyExistsException(
+                    "Email already registered"
             );
         }
 
@@ -62,7 +65,7 @@ public class UserService {
                                 request.getEmail()
                         )
                         .orElseThrow(() ->
-                                new RuntimeException(
+                                new UserNotFoundException(
                                         "User not found"
                                 )
                         );
@@ -74,8 +77,8 @@ public class UserService {
                 );
 
         if(!matches) {
-            throw new RuntimeException(
-                    "Invalid password"
+            throw new UnAuthorizedUserException(
+                    "Invalid user email / password"
             );
         }
 

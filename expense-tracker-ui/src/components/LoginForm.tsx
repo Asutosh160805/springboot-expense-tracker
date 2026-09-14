@@ -1,7 +1,9 @@
-import {useState} from "react";
-import {Link} from "react-router-dom";
+import {useContext, useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
 import {handleError, handleSuccess} from "../utils/utility.ts";
 import {ToastContainer} from "react-toastify";
+import {authenticateUser} from "../services/auth.ts";
+import {LocalAuthContext} from "./AuthProvider.tsx";
 
 export function LoginForm() {
     const [formData, setFormData] = useState({
@@ -10,6 +12,10 @@ export function LoginForm() {
     });
 
     const [loading, setLoading] = useState(false);
+    //const {setAccessToken} = useContext(TokenContext);
+    const {login} = useContext(LocalAuthContext)
+
+    const navigate = useNavigate();
 
     async function handleSubmit(e : any) {
         e.preventDefault();
@@ -22,30 +28,17 @@ export function LoginForm() {
                 throw new Error('Email and Password are required');
             }
 
+            const data = await authenticateUser(formData);
 
-
-            const response = await fetch(
-                "http://localhost:8080/auth/login",
-                {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(formData)
-                }
-            );
-
-            console.log(response);
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "Login failed");
-            }
+            //setAccessToken(data.token);
+            login(data.token);
 
             handleSuccess("Logged in successfully");
 
-            console.log(data);
+            setTimeout(() => {
+                navigate('/home', {replace : true})
+            }, 1000);
+
         } catch(error : any) {
             handleError(error.message);
         } finally {
@@ -69,7 +62,7 @@ export function LoginForm() {
                 <div>
                     <label htmlFor='email'>Email</label>
                     <input
-                        type='text'
+                        type='email'
                         name='email'
                         placeholder='Enter your email'
                         value={formData.email}

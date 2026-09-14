@@ -52,10 +52,9 @@ export function SignUpForm() {
             handleSuccess("Account created successfully");
 
             setTimeout(() => {
-                navigate('/login')
+                navigate('/login', {replace : true})
             }, 1000);
 
-            console.log(data);
         } catch(error : any) {
             handleError(error.message);
         } finally {
